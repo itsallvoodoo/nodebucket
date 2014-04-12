@@ -1,4 +1,4 @@
-INSERT INTO `bukket_facts` (`fact`, `tidbit`, `verb`, `RE`, `protected`, `mood`, `chance`) VALUES
+INSERT INTO `bucket_facts` (`fact`, `tidbit`, `verb`, `RE`, `protected`, `mood`, `chance`) VALUES
 ('band name reply', '"$band" would be a good name for a band.', '<reply>', 0, 1, NULL, NULL),
 ('band name reply', '"$band" would be a nice name for a band.', '<reply>', 0, 1, NULL, NULL),
 ('band name reply', '"$band" would be a nice name for a rock band.', '<reply>', 0, 1, NULL, NULL),
@@ -33,7 +33,7 @@ INSERT INTO `bukket_facts` (`fact`, `tidbit`, `verb`, `RE`, `protected`, `mood`,
 ('takes item', 'now contains $item.', '<action>', 0, 1, NULL, NULL),
 ('takes item', 'Okay, $who.', '<reply>', 0, 1, NULL, NULL);
 
-INSERT INTO `bukket_items` (`channel`, `what`, `user`) VALUES
+INSERT INTO `bucket_items` (`channel`, `what`, `user`) VALUES
 ('#sample', 'the Creature', 'the Black Lagoon'),
 ('#sample', 'two turtle doves', 'Puddle'),
 ('#sample', 'three french hens', 'Puddle'),
@@ -46,12 +46,12 @@ INSERT INTO `bukket_items` (`channel`, `what`, `user`) VALUES
 ('#sample', 'a comeback', 'QwerkyOne'),
 ('#sample', 'a nice ass-car', 'QwerkyOne'),
 ('#sample', 'the root password', 'QwerkyOne'),
-('#sample', 'a dirty bukket', 'QwerkyOne'),
+('#sample', 'a dirty bucket', 'QwerkyOne'),
 ('#sample', 'a magic wand', 'QwerkyOne'),
 ('#sample', 'a headcrab', 'Jekotia'),
 ('#sample', '42 hikers a-hitching', 'QwerkyOne');
 
-INSERT INTO `bukket_vars` (`id`, `name`, `perms`, `type`) VALUES
+INSERT INTO `bucket_vars` (`id`, `name`, `perms`, `type`) VALUES
 (901, 'verb', 'read-only', 'verb'),
 (902, 'noun', 'read-only', 'noun'),
 (903, 'adjective', 'read-only', 'var'),
@@ -62,7 +62,7 @@ INSERT INTO `bukket_vars` (`id`, `name`, `perms`, `type`) VALUES
 (908, 'weekday', 'read-only', 'var'),
 (909, 'band', 'read-only', 'var');
 
-INSERT INTO `bukket_values` (`var_id`, `value`) VALUES
+INSERT INTO `bucket_values` (`var_id`, `value`) VALUES
 (901, 'hug'),
 (901, 'kiss'),
 (901, 'listen'),

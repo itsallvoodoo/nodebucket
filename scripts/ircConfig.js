@@ -3,7 +3,7 @@
 * author:   Chad Hobbs
 * created:  140327
 *
-* description: Configuration script for nodebukket
+* description: Configuration script for nodebucket
 */
 
 // Configuration Object
@@ -11,7 +11,7 @@ var config = {
     // For Channels, first must be command/control, second+ is public
 	channels: ["#yourControlChannel","#yourPublicChannel","#yourLoggingChannel"],
 	server: "irc.freenode.net",
-	botName: "nodebukket",
+	botName: "nodebucket",
     port: 6667,
     debug: false,
     showErrors: false,

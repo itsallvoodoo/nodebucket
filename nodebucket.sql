@@ -10,16 +10,16 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 --
--- Database: `nodebukket`
+-- Database: `nodebucket`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `bukket_facts`
+-- Table structure for table `bucket_facts`
 --
 
-CREATE TABLE IF NOT EXISTS `bukket_facts` (
+CREATE TABLE IF NOT EXISTS `bucket_facts` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `fact` varchar(128) NOT NULL,
   `tidbit` text NOT NULL,
@@ -37,10 +37,10 @@ CREATE TABLE IF NOT EXISTS `bukket_facts` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `bukket_items`
+-- Table structure for table `bucket_items`
 --
 
-CREATE TABLE IF NOT EXISTS `bukket_items` (
+CREATE TABLE IF NOT EXISTS `bucket_items` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `channel` varchar(64) NOT NULL,
   `what` varchar(255) NOT NULL,
@@ -68,10 +68,10 @@ CREATE TABLE IF NOT EXISTS `mainlog` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `bukket_values`
+-- Table structure for table `bucket_values`
 --
 
-CREATE TABLE IF NOT EXISTS `bukket_values` (
+CREATE TABLE IF NOT EXISTS `bucket_values` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `var_id` int(10) unsigned NOT NULL,
   `value` varchar(32) NOT NULL,
@@ -82,10 +82,10 @@ CREATE TABLE IF NOT EXISTS `bukket_values` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `bukket_vars`
+-- Table structure for table `bucket_vars`
 --
 
-CREATE TABLE IF NOT EXISTS `bukket_vars` (
+CREATE TABLE IF NOT EXISTS `bucket_vars` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(16) NOT NULL,
   `perms` enum('read-only','editable') NOT NULL default 'read-only',

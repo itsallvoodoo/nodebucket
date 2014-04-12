@@ -1,5 +1,5 @@
 /*
-* name:     nodebukket.js
+* name:     nodebucket.js
 * author:   Chad Hobbs
 * contributors: None
 * created:  140327
@@ -20,8 +20,8 @@ var orm = require("orm");
 
 // Define our connection to the database
 // The example mysql connection file on github is called mysqlConfig.js
-var voodooORM = require("./scripts/voodooMysqlConfig");
-var db = orm.connect(voodooORM.config);
+var myORM = require("./scripts/mysqlConfig");
+var db = orm.connect(myORM.config);
 
 
 
@@ -51,7 +51,7 @@ db.on("connect", function(err) {
 
 	// The config library is used to pull in custom irc server config files and specific modules for this bot
 	// The normal config file in github is called ircConfig.js
-	var modConfig = require("./scripts/voodooircConfig")
+	var modConfig = require("./scripts/ircConfig")
 	var config = modConfig.config;
 
 	// TODO I believe I need require in order to implement dynamic script loading
