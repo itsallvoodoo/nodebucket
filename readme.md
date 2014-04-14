@@ -4,7 +4,7 @@ nodebucket
 Nodebucket is a re-imagining of xkcd's nodebucket irc bot, written in node!
 The project is included here, with instructions for installation.
 
-The database has not been added to the repository yet, but it will be eventually.
+The database has not been tested yet, amongst other things. I wouldn't try this at home yet, unless you know what you are doing.
 
 What is nodebucket?
 ---------------
