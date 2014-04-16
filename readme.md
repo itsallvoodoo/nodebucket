@@ -17,7 +17,7 @@ how to get started, a full wiki is in the works.
 In order to teach nodebucket, you must address him directly by saying "nodebucket, " + command, or whatever
 you name your nodebucket. If you are on Freenode, nodebucket is already taken. Sorry I'm not sorry.
 
-One of the important departures from the original nodebucket is the modularity of the project. Different features
+One of the important departures from the original bucket is the modularity of the project. Different features
 can be used and managed via irc by adding custom modules. They will be in constant development; stay tuned.
 
 Installing
@@ -28,7 +28,7 @@ The following installation instructions are assuming you are using an ubuntu ser
 1. Clone this repository.
 
 2. Install javascript dependencies.
-    First, install node. Detailed instructions can be found [here](http://howtonode.org/how-to-install-nodejs).
+    First, install node. Detailed instructions can be found [here](http://howtonode.org/how-to-install-nodejs).  
     `$ sudo apt-get install g++ curl libssl-dev apache2-utils`  
     `$ sudo apt-get install git-core`  
     `$ git clone git://github.com/ry/node.git`  
