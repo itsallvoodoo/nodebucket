@@ -161,21 +161,56 @@ db.on("connect", function(err) {
 				break;
 			case 'are':
 				// Assign synonyms to keywords
-
+				result = text.split(/ are (.+)?/);
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "are";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 
 				break;
 			case 'is':
 				// Assign verbs to keywords
-
+				result = text.split(/ is (.+)?/);
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "is";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 				break;
+
 			case 'loves':
 				// Describe items of affectation for keywords
-
+				result = text.split(/ loves (.+)?/);
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "loves";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 				break;
+
 			case 'strangles':
 				// List items of annoyance for keywords
-
+				result = text.split(/ strangles (.+)?/);
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "strangles";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 				break;
+
 			default:
 				// Basic bot key phrase response insertion
 
