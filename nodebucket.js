@@ -115,7 +115,7 @@ db.on("connect", function(err) {
 	*  ----------------------------------------------------------------------------------------
 	*/
 	function dbInsert(fact, tidbit, verb, RE, protected, callback) {
-		
+		// TODO - Implement
 
 	}
 
@@ -147,7 +147,16 @@ db.on("connect", function(err) {
 				});
 				break;
 			case 'action':
-				// Keyword triggers bot to do a /me + response
+				// Basic bot key phrase to do a /me + response insertion
+				result = text.split(" <action> ");
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "<action>";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 
 				break;
 			case 'are':
