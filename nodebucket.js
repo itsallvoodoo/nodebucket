@@ -136,7 +136,7 @@ db.on("connect", function(err) {
 		switch(returned) {
 			case 'reply':
 				// Basic bot key phrase response insertion
-				result = text.split(" <reply> ");
+				result = text.split(/ <reply> (.+)?/);
 				newRecord.fact = result[0];
 				newRecord.tidbit = result[1];
 				newRecord.verb = "<reply>";
@@ -148,7 +148,7 @@ db.on("connect", function(err) {
 				break;
 			case 'action':
 				// Basic bot key phrase to do a /me + response insertion
-				result = text.split(" <action> ");
+				result = text.split(/ <action> (.+)?/);
 				newRecord.fact = result[0];
 				newRecord.tidbit = result[1];
 				newRecord.verb = "<action>";
@@ -161,20 +161,56 @@ db.on("connect", function(err) {
 				break;
 			case 'are':
 				// Assign synonyms to keywords
+				result = text.split(/ are (.+)?/);
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "are";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 
 				break;
 			case 'is':
 				// Assign verbs to keywords
-
+				result = text.split(/ is (.+)?/);
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "is";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 				break;
+
 			case 'loves':
 				// Describe items of affectation for keywords
-
+				result = text.split(/ loves (.+)?/);
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "loves";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 				break;
+
 			case 'strangles':
 				// List items of annoyance for keywords
-
+				result = text.split(/ strangles (.+)?/);
+				newRecord.fact = result[0];
+				newRecord.tidbit = result[1];
+				newRecord.verb = "strangles";
+				newRecord.RE = 0;
+				newRecord.protected = 0;
+				Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+				});
 				break;
+
 			default:
 				// Basic bot key phrase response insertion
 
@@ -195,18 +231,20 @@ db.on("connect", function(err) {
 	*/
 	function findPattern(input) {
 		// TODO I want to come up with some clever list or array method of going through the regexes, eventually
+		// Maybe a hashmap iteration, but I am not sure about it
 
 		// TODO need to add:
 		// what was that
 		// forget that
 		// forget #xxx
-		
-		var reply = /[^]( <reply> )[^]/i;
-		var action = /[^]( <action> )[^]/i;
-		var are = /[^]( are )[^]/i;
-		var is = /[^]( is )[^]/i;
-		var loves = /[^]( loves )[^]/i;
-		var strangles = /[^]( strangles )[^]/i;
+
+
+		var reply = /[^]( <reply> )(.+)?/i;
+		var action = /[^]( <action> )(.+)?/i;
+		var are = /[^]( are )(.+)?/i;
+		var is = /[^]( is )(.+)?/i;
+		var loves = /[^]( loves )(.+)?/i;
+		var strangles = /[^]( strangles )(.+)?/i;
 		
 		if (reply.test(input)) {
 			returned = "reply"
