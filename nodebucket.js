@@ -136,7 +136,7 @@ db.on("connect", function(err) {
 		switch(returned) {
 			case 'reply':
 				// Basic bot key phrase response insertion
-				result = text.split(" <reply> ");
+				result = text.split(/ <reply> (.+)?/);
 				newRecord.fact = result[0];
 				newRecord.tidbit = result[1];
 				newRecord.verb = "<reply>";
@@ -148,7 +148,7 @@ db.on("connect", function(err) {
 				break;
 			case 'action':
 				// Basic bot key phrase to do a /me + response insertion
-				result = text.split(" <action> ");
+				result = text.split(/ <action> (.+)?/);
 				newRecord.fact = result[0];
 				newRecord.tidbit = result[1];
 				newRecord.verb = "<action>";
@@ -161,6 +161,7 @@ db.on("connect", function(err) {
 				break;
 			case 'are':
 				// Assign synonyms to keywords
+
 
 				break;
 			case 'is':
@@ -195,12 +196,14 @@ db.on("connect", function(err) {
 	*/
 	function findPattern(input) {
 		// TODO I want to come up with some clever list or array method of going through the regexes, eventually
+		// Maybe a hashmap iteration, but I am not sure about it
 
 		// TODO need to add:
 		// what was that
 		// forget that
 		// forget #xxx
-		
+
+
 		var reply = /[^]( <reply> )(.+)?/i;
 		var action = /[^]( <action> )(.+)?/i;
 		var are = /[^]( are )(.+)?/i;
