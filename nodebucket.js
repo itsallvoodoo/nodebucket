@@ -201,12 +201,12 @@ db.on("connect", function(err) {
 		// forget that
 		// forget #xxx
 		
-		var reply = /[^]( <reply> )[^]/i;
-		var action = /[^]( <action> )[^]/i;
-		var are = /[^]( are )[^]/i;
-		var is = /[^]( is )[^]/i;
-		var loves = /[^]( loves )[^]/i;
-		var strangles = /[^]( strangles )[^]/i;
+		var reply = /[^]( <reply> )(.+)?/i;
+		var action = /[^]( <action> )(.+)?/i;
+		var are = /[^]( are )(.+)?/i;
+		var is = /[^]( is )(.+)?/i;
+		var loves = /[^]( loves )(.+)?/i;
+		var strangles = /[^]( strangles )(.+)?/i;
 		
 		if (reply.test(input)) {
 			returned = "reply"
