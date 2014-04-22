@@ -79,7 +79,7 @@ db.on("connect", function(err) {
 	* Description:   This function is used to access the bot database and perform a select
 	*  ----------------------------------------------------------------------------------------
 	*/ 
-	function dbFind(text) {
+	function dbFind(text, callback) {
 		Bucket_Facts.find({ fact: text}, function(err, all_facts) {
 			if (err) throw err;
 			try {
@@ -88,10 +88,10 @@ db.on("connect", function(err) {
 				if (num > 1) {
 					var num = Math.floor((Math.random()*num));
 					console.log("Attempting to access number " + num);
-					return all_facts[num].tidbit;
+					callback(all_facts[num].tidbit);
 				} else {
 					console.log(all_facts[0].tidbit);
-					return all_facts[0].tidbit;
+					callback(all_facts[0].tidbit);
 				}
 			}
 			catch(err) {
@@ -324,10 +324,8 @@ db.on("connect", function(err) {
 						
 						} else {
 							// Standard trigger lookup
-							var printit = "hello";
 							console.log("In message listener, should print factoid if found.");
-							printit = dbFind(text);
-							printToChannel(printit);						
+							dbFind(text, printToChannel);
 						}
 				}
 				catch(err) {
