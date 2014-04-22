@@ -84,13 +84,15 @@ db.on("connect", function(err) {
 			if (err) throw err;
 			try {
 				var num = all_facts.length;
-				console.log("Total facts found: %d", num);
+				// TODO Temporary logging of data, may be removed in production
+				printToChannel("Total facts found: " + num.toString(),config.channels[1]);
 				if (num > 1) {
 					var num = Math.floor((Math.random()*num));
-					console.log("Attempting to access number " + num);
+					// TODO Temporary logging of data, may be removed in production
+					printToChannel("Attempting to access number " + num.toString(),config.channels[1]);
 					callback(all_facts[num].tidbit);
 				} else {
-					console.log(all_facts[0].tidbit);
+					// TODO Temporary logging of data, may be removed in production
 					callback(all_facts[0].tidbit);
 				}
 			}
@@ -130,9 +132,7 @@ db.on("connect", function(err) {
 	*/
 	function dbCommand(text) {
 		var returned = findPattern(text);
-		printToChannel("Looking at: " + text);
 		var newRecord = {};
-		var status = "Okay, $who";
 		switch(returned) {
 			case 'reply':
 				// Basic bot key phrase response insertion
@@ -213,7 +213,8 @@ db.on("connect", function(err) {
 
 			case 'none':
 				// If a command was not understood
-				status = "I did not understand.";
+				dbFind("failresponse", printToChannel);
+				return;
 			default:
 				// Basic bot key phrase response insertion
 
@@ -221,7 +222,7 @@ db.on("connect", function(err) {
 
 		}
 			
-		return status; // TODO Temp filler until function completed
+		return "Okay, $who"; // TODO Temp filler until function completed
 	}
 
 
@@ -281,7 +282,9 @@ db.on("connect", function(err) {
 				if(!channel) {
 				bot.say(config.channels[0], printString);
 			} else{
-				bot.say(channel, printString);
+				if(printString) {
+					bot.say(channel, printString);
+				}
 			}
 		}
 		catch(err) {
@@ -320,17 +323,19 @@ db.on("connect", function(err) {
 						// If the beginning of the text is the bot's name, then send to command sequence
 						if (text.substr(0,config.botName.length + 2) == (config.botName + ", ")) {
 							printToChannel(dbCommand(text.substr(config.botName.length+2)));
-							console.log("Finished with command stuff");
+							// TODO Temporary logging of data, may be removed in production
+							printToChannel("Finished with command stuff",config.channels[1]);
 						
 						} else {
 							// Standard trigger lookup
-							console.log("In message listener, should print factoid if found.");
+							// TODO Temporary logging of data, may be removed in production
+							printToChannel("In message listener, should print factoid if found.",config.channels[1]);
 							dbFind(text, printToChannel);
 						}
 				}
 				catch(err) {
-					console.log("Fail in connect: " + err.message)
-					printToChannel("That didn't work...");
+					// TODO Temporary logging of data, may be removed in production
+					printToChannel("Fail in connect: " + err.message,config.channels[1]);
 				}
 			}
 
