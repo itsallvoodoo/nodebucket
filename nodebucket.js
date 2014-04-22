@@ -75,12 +75,11 @@ db.on("connect", function(err) {
 	/* ----------------------------------------------------------------------------------------
 	* Function Name: dbFind
 	* Parameters:    text: the fact to be searched for
-	* Parameters:    callback, where to return the query results
-	* Returns:       NA
+	* Returns:       the query results
 	* Description:   This function is used to access the bot database and perform a select
 	*  ----------------------------------------------------------------------------------------
 	*/ 
-	function dbFind(text, callback) {
+	function dbFind(text) {
 		Bucket_Facts.find({ fact: text}, function(err, all_facts) {
 			if (err) throw err;
 			try {
@@ -89,9 +88,10 @@ db.on("connect", function(err) {
 				if (num > 1) {
 					var num = Math.floor((Math.random()*num));
 					console.log("Attempting to access number " + num);
-					callback(all_facts[num].tidbit);
+					return all_facts[num].tidbit;
 				} else {
-					callback(all_facts[0].tidbit);
+					console.log(all_facts[0].tidbit);
+					return all_facts[0].tidbit;
 				}
 			}
 			catch(err) {
@@ -109,13 +109,13 @@ db.on("connect", function(err) {
 	* Parameters: 	 verb: The action type to be inserted
 	* Parameters: 	 RE: Dunno what this does, keeping it for legacy
 	* Parameters: 	 protected: Is this erase safe
-	* Parameters:    callback, where to return the Insert results
-	* Returns:       NA
+	* Returns:       the Insert result
 	* Description:   This function issues various commands to the bot
 	*  ----------------------------------------------------------------------------------------
 	*/
-	function dbInsert(fact, tidbit, verb, RE, protected, callback) {
+	function dbInsert(fact, tidbit, verb, RE, protected) {
 		// TODO - Implement
+
 
 	}
 
@@ -124,15 +124,15 @@ db.on("connect", function(err) {
 	/* ----------------------------------------------------------------------------------------
 	* Function Name: dbCommand
 	* Parameters:    text: String to be analyzed to determine what command is being issued
-	* Parameters:    callback, where to return the Command results
-	* Returns:       NA
+	* Returns:       the Command results
 	* Description:   This function issues various commands to the bot
 	*  ----------------------------------------------------------------------------------------
 	*/
-	function dbCommand(text, callback) {
+	function dbCommand(text) {
 		var returned = findPattern(text);
 		printToChannel("Looking at: " + text);
 		var newRecord = {};
+		var status = "Okay, $who";
 		switch(returned) {
 			case 'reply':
 				// Basic bot key phrase response insertion
@@ -211,6 +211,9 @@ db.on("connect", function(err) {
 				});
 				break;
 
+			case 'none':
+				// If a command was not understood
+				status = "I did not understand.";
 			default:
 				// Basic bot key phrase response insertion
 
@@ -218,7 +221,7 @@ db.on("connect", function(err) {
 
 		}
 			
-		callback(returned); // TODO Temp filler until function completed
+		return status; // TODO Temp filler until function completed
 	}
 
 
@@ -238,7 +241,7 @@ db.on("connect", function(err) {
 		// forget that
 		// forget #xxx
 
-
+		var returned = "none";
 		var reply = /[^]( <reply> )(.+)?/i;
 		var action = /[^]( <action> )(.+)?/i;
 		var are = /[^]( are )(.+)?/i;
@@ -316,11 +319,15 @@ db.on("connect", function(err) {
 						// Database Command detection
 						// If the beginning of the text is the bot's name, then send to command sequence
 						if (text.substr(0,config.botName.length + 2) == (config.botName + ", ")) {
-							dbCommand(text.substr(config.botName.length+2), printToChannel);
+							printToChannel(dbCommand(text.substr(config.botName.length+2)));
+							console.log("Finished with command stuff");
 						
 						} else {
 							// Standard trigger lookup
-							dbFind(text, printToChannel);						
+							var printit = "hello";
+							console.log("In message listener, should print factoid if found.");
+							printit = dbFind(text);
+							printToChannel(printit);						
 						}
 				}
 				catch(err) {
