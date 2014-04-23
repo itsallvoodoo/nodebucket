@@ -115,8 +115,18 @@ db.on("connect", function(err) {
 	* Description:   This function issues various commands to the bot
 	*  ----------------------------------------------------------------------------------------
 	*/
-	function dbInsert(fact, tidbit, verb, RE, protected) {
-		// TODO - Implement
+	function dbInsert(fact, tidbit, verb, RE, protected, callback) {
+		var newRecord = {};
+		newRecord.fact = fact;
+		newRecord.tidbit = tidbit;
+		newRecord.verb = verb;
+		newRecord.RE = RE;
+		newRecord.protected = protected;
+
+		Bucket_Facts.create(newRecord, function(err, results) {
+					if (err) throw err;
+					else callback("okay, $who");
+				});
 
 
 	}
@@ -132,97 +142,73 @@ db.on("connect", function(err) {
 	*/
 	function dbCommand(text) {
 		var returned = findPattern(text);
-		var newRecord = {};
+		var fact = "";
+		var tidbit = "";
+		var verb = "";
+		var RE = 0;
+		var protected = 0;
 		switch(returned) {
 			case 'reply':
 				// Basic bot key phrase response insertion
 				result = text.split(/ <reply> (.+)?/);
-				newRecord.fact = result[0];
-				newRecord.tidbit = result[1];
-				newRecord.verb = "<reply>";
-				newRecord.RE = 0;
-				newRecord.protected = 0;
-				Bucket_Facts.create(newRecord, function(err, results) {
-					if (err) throw err;
-				});
+				fact = result[0];
+				tidbit = result[1];
+				verb = "<reply>";
 				break;
+
 			case 'action':
 				// Basic bot key phrase to do a /me + response insertion
 				result = text.split(/ <action> (.+)?/);
-				newRecord.fact = result[0];
-				newRecord.tidbit = result[1];
-				newRecord.verb = "<action>";
-				newRecord.RE = 0;
-				newRecord.protected = 0;
-				Bucket_Facts.create(newRecord, function(err, results) {
-					if (err) throw err;
-				});
-
+				fact = result[0];
+				tidbit = result[1];
+				verb = "<action>";
 				break;
+
 			case 'are':
 				// Assign synonyms to keywords
 				result = text.split(/ are (.+)?/);
-				newRecord.fact = result[0];
-				newRecord.tidbit = result[1];
-				newRecord.verb = "are";
-				newRecord.RE = 0;
-				newRecord.protected = 0;
-				Bucket_Facts.create(newRecord, function(err, results) {
-					if (err) throw err;
-				});
-
+				fact = result[0];
+				tidbit = result[1];
+				verb = "are";
 				break;
+
 			case 'is':
 				// Assign verbs to keywords
 				result = text.split(/ is (.+)?/);
-				newRecord.fact = result[0];
-				newRecord.tidbit = result[1];
-				newRecord.verb = "is";
-				newRecord.RE = 0;
-				newRecord.protected = 0;
-				Bucket_Facts.create(newRecord, function(err, results) {
-					if (err) throw err;
-				});
+				fact = result[0];
+				tidbit = result[1];
+				verb = "is";
 				break;
 
 			case 'loves':
 				// Describe items of affectation for keywords
 				result = text.split(/ loves (.+)?/);
-				newRecord.fact = result[0];
-				newRecord.tidbit = result[1];
-				newRecord.verb = "loves";
-				newRecord.RE = 0;
-				newRecord.protected = 0;
-				Bucket_Facts.create(newRecord, function(err, results) {
-					if (err) throw err;
-				});
+				fact = result[0];
+				tidbit = result[1];
+				verb = "loves";
 				break;
 
 			case 'strangles':
 				// List items of annoyance for keywords
 				result = text.split(/ strangles (.+)?/);
-				newRecord.fact = result[0];
-				newRecord.tidbit = result[1];
-				newRecord.verb = "strangles";
-				newRecord.RE = 0;
-				newRecord.protected = 0;
-				Bucket_Facts.create(newRecord, function(err, results) {
-					if (err) throw err;
-				});
+				fact = result[0];
+				tidbit = result[1];
+				verb = "strangles";
 				break;
 
 			case 'none':
 				// If a command was not understood
 				dbFind("failresponse", printToChannel);
-				return;
+
 			default:
 				// Basic bot key phrase response insertion
 
 				break;
 
 		}
-			
-		return "Okay, $who"; // TODO Temp filler until function completed
+		if (returned != 'none') {
+			dbInsert(result[0], result[1], "<reply>", 0, 0, printToChannel);
+		}
 	}
 
 
@@ -322,7 +308,7 @@ db.on("connect", function(err) {
 						// Database Command detection
 						// If the beginning of the text is the bot's name, then send to command sequence
 						if (text.substr(0,config.botName.length + 2) == (config.botName + ", ")) {
-							printToChannel(dbCommand(text.substr(config.botName.length+2)));
+							dbCommand(text.substr(config.botName.length+2));
 							// TODO Temporary logging of data, may be removed in production
 							printToChannel("Finished with command stuff",config.channels[1]);
 						
