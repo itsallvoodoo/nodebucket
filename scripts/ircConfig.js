@@ -9,7 +9,7 @@
 // Configuration Object
 var config = {
     // For Channels, first must be command/control, second+ is public
-	channels: ["#yourControlChannel","#yourPublicChannel","#yourLoggingChannel"],
+	channels: ["#yourControlChannel","#yourPublicChannel"],
 	server: "irc.freenode.net",
 	botName: "nodebucket",
     port: 6667,
