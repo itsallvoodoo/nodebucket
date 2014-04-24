@@ -4,7 +4,7 @@
 * contributors: None
 * created:  140327
 *
-* description: This is the glory and wonder that is node bot
+* description: This is the glory and wonder that is node bot, need to change the project name to nodebot.js
 */
 
 /* ----------------------------------------------------------------------------------------
