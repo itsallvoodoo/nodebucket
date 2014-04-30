@@ -14,16 +14,52 @@
 
 // Dependencies
 var irc = require("irc");
-var bukketLoad = require("./modules/bukket")
-var bukket = bukketLoad.bukket;
+var fs = require('fs');
 
 // The config library is used to pull in custom irc server config files and specific modules for this bot
 // The normal config file in github is called ircConfig.js
 var modConfig = require("./scripts/ircConfig")
 var config = modConfig.config;
 
-// TODO I believe I need require in order to implement dynamic script loading
-//var req = require("require")
+
+/*
+// This array contains all the modules that are to be loaded during runtime
+var moduleArray = [];
+// Build the module list dynamically
+fs.readdir("./modules", function(err,files) {
+	if (err) throw err;
+	console.log("---Loading modules---");
+	for (var i=0;i<files.length;i++) {
+		files[i] = files[i].substring(0, files[i].length - 3);
+	}
+	loadModules(files);
+});
+*/
+var path_module = require('path');
+var module_holder = {};
+
+function LoadModules(path) {
+    fs.lstat(path, function(err, stat) {
+        if (stat.isDirectory()) {
+            // we have a directory: do a tree walk
+            fs.readdir(path, function(err, files) {
+                var f, l = files.length;
+                for (var i = 0; i < l; i++) {
+                    f = path_module.join(path, files[i]);
+                    LoadModules(f);
+                }
+            });
+        } else {
+            // we have a file: load it
+            require(path)(module_holder);
+        }
+    });
+}
+var DIR = path_module.join(__dirname, 'modules');
+LoadModules(DIR);
+
+exports.module_holder = module_holder;
+
 
 
 /* ----------------------------------------------------------------------------------------
@@ -35,10 +71,32 @@ var bot = new irc.Client(config.server, config.botName, {
 	channels: config.channels
 });
 
+
 /* ----------------------------------------------------------------------------------------
 * 										Functions
 *  ----------------------------------------------------------------------------------------
 */
+
+/* ----------------------------------------------------------------------------------------
+* Function Name: loadModules
+* Parameters:    text: The text to be proccessed
+* Parameters:    callback: Where the results of the processed message are sent, typically printToChannel()
+* Returns:       NA
+* Description:   This function prints a given to string to the supplied channel, else provides a default channel
+*  ----------------------------------------------------------------------------------------
+*/ 
+function loadModules(files) {
+
+	for (var i=0;i<files.length;i++) {
+		
+		console.log(files[i]);
+		var moduleLoad = require("./modules/".concat(files[i]));
+		moduleArray.push(moduleLoad["main"]);
+	};
+	console.log("---Loading complete---");
+	// callback(bukket.say(text));
+
+}
 
 /* ----------------------------------------------------------------------------------------
 * Function Name: processText
@@ -51,7 +109,9 @@ var bot = new irc.Client(config.server, config.botName, {
 function processText(text, callback) {
 
 	// TODO test loopback
-	callback(bukket.say(text));
+	// request is supposed to fire user_getDetails script
+	module_holder['user_getDetails'](req, res);
+	callback("Done"); // moduleArray[0].identifier
 
 }
 
