@@ -24,7 +24,8 @@ var irc       = require("irc")
 
 
 var BOTNAME   = ircConfig.config.botName
-  , MAINCHAN  = ircConfig.config.channels[0];
+	// For now we assume the main channel is the second one
+  , MAINCHAN  = ircConfig.config.channels[1];
 
 function error(text, newline) {
 	console.error("%sError%s: %s", RED, NC, text);
@@ -272,6 +273,7 @@ function onIRCJoin(channel, who) {
 function onIRCMsg(from, to, text, message) {
 
 	if (text.length > MAXTLEN) {
+
 		try {
 				// Database Command detection
 				// If the beginning of the text is the bot's name, then send to command sequence
