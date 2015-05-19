@@ -1,0 +1,30 @@
+{
+	"name": "nodebucket",
+	"version": "0.0.1",
+	"description": "A nodejs reboot of XKCD's bucket IRC bot",
+	"author": "itsallvoodoo <https://github.com/itsallvoodoo>",
+	"license": "GPLv3",
+	"contributors": [
+		{ 
+			"name": "pshahid",
+		 	"email": "https://github.com/pshahid"
+		}
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/itsallvoodoo/nodebucket"
+	},
+	"keywords": [
+		"bukket",
+		"bucket",
+		"nodebucket"
+	],
+	"dependencies": {
+		"orm": "2.1.25",
+		"irc": "0.3.12",
+		"mysql": "2.6.2"
+	},
+	"devDependencies": {
+		"grunt": "0.3.4"
+	}
+}
