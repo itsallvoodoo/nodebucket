@@ -4,50 +4,35 @@
 * contributors: None
 * created:  140327
 *
-* description: This is the glory and wonder that is node bot
+* description: This is the glory and wonder that is node bucket
 */
 
-/* ----------------------------------------------------------------------------------------
-* 									Configurations and Libraries
-*  ----------------------------------------------------------------------------------------
-*/
 
-// Dependencies
 var irc       = require("irc")
   , mysql     = require("mysql")
-  , orm       = require("orm");
-
-
-// Define our connection to the database
-// The example mysql connection file on github is called mysqlConfig.js
-var myORM     = require("./scripts/mysqlConfig")
+  , orm       = require("orm")
+  , myORM     = require("./scripts/mysqlConfig")
+  , ircConfig = require('./scripts/ircConfig')
   , FACTS     = null
   , DEBUG     = true
-  , ircConfig = require('./scripts/ircConfig')
-  , CLIENT    = null;
-// var db = orm.connect(myORM.config);
+  , CLIENT    = null
+  , RED       = '\033[1;31m'
+  , MAGENTA   = '\033[1;35m'
+  , CYAN      = '\033[1;36m'
+  , NC        = '\033[0m'
+  , MAXTLEN   = 5;
 
-var   RED     = '\033[1;31m'
-	, MAGENTA = '\033[1;35m'
-	, CYAN    = '\033[1;36m'
-	, NC      = '\033[0m';
 
+var BOTNAME   = ircConfig.config.botName
+  , MAINCHAN  = ircConfig.config.channels[0];
 
 function error(text, newline) {
-	if (newline) {
-		console.error("%sError%s: %s", RED, NC, text);
-	} else {
-		process.stderr.write(RED + "Error" + NC + ": " + text);
-	}
+	console.error("%sError%s: %s", RED, NC, text);
 }
 
 
 function warn(text, newline) {
-	if (newline) {
-		console.error("%Warning%s: %s", MAGENTA, NC, text);
-	} else {
-		process.stderr.write(RED + "Warning" + NC + ": " + text);
-	}
+	console.error("%sWarning%s: %s", MAGENTA, NC, text);
 }
 
 
@@ -62,6 +47,16 @@ function debug(text) {
 	console.log("%sDebug%s: %s", CYAN, NC, text);
 }
 
+function say(text, channel) {
+
+	if (!channel) {
+		// Grab first channel if not given
+		channel = MAINCHAN;
+	}
+
+	CLIENT.say(channel, text);
+ 	
+}
 
 function findPattern(input) {
 	// TODO I want to come up with some clever list or array method of going through the regexes, eventually
@@ -90,22 +85,6 @@ function findPattern(input) {
 	return "none";
 }
 
-function printToChannel(printString, channel) {
-	try {
-		if(!channel) {
-			CLIENT.say(config.channels[0], printString);
-		} else{
-			if(printString) {
-				CLIENT.say(channel, printString);
-			}
-		}
-	}
-	catch(err) {
-		console.log("Fail in printToChannel, catch: " + err);
-
-	}
-};
-
 /**** DB API FUNCTIONS ****/
 
 function onDbConnect(err, db) {
@@ -131,34 +110,50 @@ function onDbConnect(err, db) {
 	});
 }
 
+function factsFound(facts, callback) {
+	var num = facts.length;
+
+	debug("Found " + num.toString() + " facts.");
+
+	try {
+		if (num > 1) {
+			var useNum = Math.floor((Math.random() * num));
+
+			debug("Attempting to access #" + useNum.toString());
+
+			callback(facts[useNum].tidbit);
+		} else {
+			callback(facts[0].tidbit);
+		}
+	} catch (err) {
+		warn("Uncaught error when a fact was found, reason: " + err);
+	}
+}
+
+function factsNotFound(reason) {
+	warn("Fact not found, reason: " + reason);
+	FACTS.find({fact: "don't know"}, function(err, all_facts) {
+		if (err || all_facts.length === 0) {
+			var errmsg = "No facts found for the 'don\'t know' fact. Did you forget to run sample.sql?";
+
+			error(errmsg);
+			throw error(errmsg);
+		}
+
+		var pickFact = Math.floor((Math.random() * all_facts.length));
+
+		say(all_facts[pickFact].tidbit, MAINCHAN);
+	});
+}
+
 function dbFind(text, callback) {
-	FACTS.find(
-		{
-			fact: text
-		},
+	FACTS.find({ fact: text },
 		function(err, all_facts) {
 
-			if (err) throw err;
-
-			try {
-				var num = all_facts.length;
-				// TODO Temporary logging of data, may be removed in production
-				console.log("Total facts found: " + num.toString(), ircConfig.config.channels[1]);
-				// printToChannel("Total facts found: " + num.toString(),config.channels[1]);
-				if (num > 1) {
-					var num = Math.floor((Math.random()*num));
-					// TODO Temporary logging of data, may be removed in production
-					// printToChannel("Attempting to access number " + num.toString(),config.channels[1]);
-					console.log("Attempting to access number " + num.toString(), ircConfig.config.channels[1]);
-					callback(all_facts[num].tidbit);
-				} else {
-					// TODO Temporary logging of data, may be removed in production
-					callback(all_facts[0].tidbit);
-				}
-			}
-			catch(err) {
-				warn("Failed in Bucket_Facts, catch: " + err);
-				warn("Text was " + text);
+			// As long as we find a fact in the db when someone says 
+			// something, we'll repeat it. Otherwise, just keep quiet
+			if (!err && all_facts.length > 0) {
+				factsFound(all_facts, callback);
 			}
 	});
 		
@@ -237,7 +232,7 @@ function dbCommand(text) {
 
 		case 'none':
 			// If a command was not understood
-			dbFind("failresponse", printToChannel);
+			dbFind("failresponse", say);
 
 		default:
 			// Basic bot key phrase response insertion
@@ -246,7 +241,7 @@ function dbCommand(text) {
 
 	}
 	if (returned != 'none') {
-		dbInsert(result[0], result[1], "<reply>", 0, 0, printToChannel);
+		dbInsert(result[0], result[1], "<reply>", 0, 0, say);
 	}
 }
 
@@ -276,25 +271,26 @@ function onIRCJoin(channel, who) {
 
 function onIRCMsg(from, to, text, message) {
 
-	if (text.length > 5) {
+	if (text.length > MAXTLEN) {
 		try {
 				// Database Command detection
 				// If the beginning of the text is the bot's name, then send to command sequence
-				if (text.substr(0,ircConfig.config.botName.length + 2) == (config.botName + ", ")) {
+				if (text.substr(0,ircConfig.config.botName.length + 2) == (ircConfig.config.botName + ", ")) {
+					debug("Bot was addressed directly.");
+
 					dbCommand(text.substr(ircConfig.config.botName.length+2));
 					// TODO Temporary logging of data, may be removed in production
-					printToChannel("Finished with command stuff", ircConfig.config.channels[1]);
+					debug("Finished processing command.");
+					say("Finished with command stuff", MAINCHAN);
 				
 				} else {
 					// Standard trigger lookup
-					// TODO Temporary logging of data, may be removed in production
-					console.log("In message listener, should print factoid if found.",ircConfig.config.channels[1]);
-					dbFind(text, printToChannel);
+					dbFind(text, say);
 				}
 		}
 		catch(err) {
 			// TODO Temporary logging of data, may be removed in production
-			warn("Fail in connect: " + err.message, ircConfig.config.channels[1]);
+			warn("Fail in connect: " + err.message);
 		}
 	}
 
@@ -314,12 +310,19 @@ function initIRC() {
 		process.exit(100);
 	}
 
+	if (!config.channels || config.channels.length === 0) {
+		error("No channels specified to connect to.");
+
+		process.exit(1);
+	}
+
 	debug("Attempting to connect to IRC...");
 
-	var client = new irc.Client(config.server, config.botName, { 
-		channels: config.channels
-	});
-
+	var client = new irc.Client(
+		config.server,
+		config.botName, 
+		{ channels: config.channels}
+	);
 
 	// Do the client's event registration here
 	client.on('registered', onIRCConnect);
