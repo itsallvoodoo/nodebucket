@@ -24,8 +24,23 @@ var irc       = require("irc")
 
 
 var BOTNAME   = ircConfig.config.botName
-	// For now we assume the main channel is the second one
-  , MAINCHAN  = ircConfig.config.channels[1];
+  , MAINCHAN  = null;
+
+
+// Helps us set the channel as the first one that we find
+// A better configuration style might improve this, like { mainchan: "", cmdchan: "", logchan: ""}
+for (var ind = 0; ind < ircConfig.config.channels.length; ind++) {
+	if (!MAINCHAN) {
+		MAINCHAN = ircConfig.config.channels[ind];
+	}
+}
+
+if (!MAINCHAN) {
+	error(" Unable to set main channel for IRC config.\n\
+	This is likely due to the channel config not being an array, or having no elements.");
+
+	process.exit(1);
+}
 
 function error(text, newline) {
 	console.error("%sError%s: %s", RED, NC, text);
@@ -115,7 +130,7 @@ function factsFound(facts, callback) {
 	var num = facts.length;
 
 	debug("Found " + num.toString() + " facts.");
-
+   
 	try {
 		if (num > 1) {
 			var useNum = Math.floor((Math.random() * num));
@@ -127,7 +142,8 @@ function factsFound(facts, callback) {
 			callback(facts[0].tidbit);
 		}
 	} catch (err) {
-		warn("Uncaught error when a fact was found, reason: " + err);
+		warn("Uncaught error when a fact was found, reason: " + err.toString());
+		warn(err.stack);
 	}
 }
 
@@ -182,6 +198,8 @@ function dbCommand(text) {
 	var verb = "";
 	var RE = 0;
 	var protected = 0;
+
+
 	switch(returned) {
 		case 'reply':
 			// Basic bot key phrase response insertion
