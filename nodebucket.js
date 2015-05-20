@@ -364,7 +364,8 @@ function main() {
 
 		CLIENT = initIRC(ircCfg.config);
 	} catch (err) {
-		error("Uncaught exception in top-level try-except, error: " + error);
+		error("Uncaught exception in top-level try-except, error: " + err);
+		error(err.stack);
 	}
 }
 
