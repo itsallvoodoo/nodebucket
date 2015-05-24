@@ -74,6 +74,14 @@ function say(text, channel) {
  	
 }
 
+function botAddressed(text) {
+	var msgBegin = text.substr(0, BOTNAME.length + 2)
+	  , reg = new RegExp(BOTNAME + "(,|:)");
+
+
+	return reg.test(msgBegin);
+}
+
 function findPattern(input) {
 	// TODO I want to come up with some clever list or array method of going through the regexes, eventually
 	// Maybe a hashmap iteration, but I am not sure about it
@@ -126,20 +134,22 @@ function onDbConnect(err, db) {
 	});
 }
 
-function factsFound(facts, callback) {
+function factsFound(facts, callback, to) {
 	var num = facts.length;
 
 	debug("Found " + num.toString() + " facts.");
    
 	try {
+		// Either way use 'to' to send tidbit to the channel that the fact
+		// was requested on
 		if (num > 1) {
 			var useNum = Math.floor((Math.random() * num));
 
 			debug("Attempting to access #" + useNum.toString());
-
-			callback(facts[useNum].tidbit);
+			
+			callback(facts[useNum].tidbit, to);
 		} else {
-			callback(facts[0].tidbit);
+			callback(facts[0].tidbit, to);
 		}
 	} catch (err) {
 		warn("Uncaught error when a fact was found, reason: " + err.toString());
@@ -163,14 +173,14 @@ function factsNotFound(reason) {
 	});
 }
 
-function dbFind(text, callback) {
+function dbFind(text, callback, to) {
 	FACTS.find({ fact: text },
 		function(err, all_facts) {
 
 			// As long as we find a fact in the db when someone says 
 			// something, we'll repeat it. Otherwise, just keep quiet
 			if (!err && all_facts.length > 0) {
-				factsFound(all_facts, callback);
+				factsFound(all_facts, callback, to);
 			}
 	});
 		
@@ -288,24 +298,31 @@ function onIRCJoin(channel, who) {
 	}
 }
 
+function onIRCPriv(from, text) {
+	debug("Pm received: " + text);
+}
+
 function onIRCMsg(from, to, text, message) {
+	if (to === BOTNAME) {
+		onIRCPriv(from, text);
+		return;
+	}
 
 	if (text.length > MAXTLEN) {
 
 		try {
 				// Database Command detection
 				// If the beginning of the text is the bot's name, then send to command sequence
-				if (text.substr(0,ircConfig.config.botName.length + 2) == (ircConfig.config.botName + ", ")) {
+				if (botAddressed(text)) {
 					debug("Bot was addressed directly.");
 
 					dbCommand(text.substr(ircConfig.config.botName.length+2));
 					// TODO Temporary logging of data, may be removed in production
-					debug("Finished processing command.");
-					say("Finished with command stuff", MAINCHAN);
+					say("Finished with command stuff", to);
 				
 				} else {
 					// Standard trigger lookup
-					dbFind(text, say);
+					dbFind(text, say, to);
 				}
 		}
 		catch(err) {
